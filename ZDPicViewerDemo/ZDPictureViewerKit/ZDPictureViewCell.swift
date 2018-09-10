@@ -14,7 +14,7 @@ public class ZDPictureViewCell: UICollectionViewCell {
     //MARK:- 属性设置
     
     //  图片
-    lazy var imageView: AnimatedImageView = {
+    public lazy var imageView: AnimatedImageView = {
         let imageView = AnimatedImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true

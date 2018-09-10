@@ -13,8 +13,7 @@ let kCommonTag: Int = 1000
 
 
 //  bundle
-let ZDPictureViewerBundle: Bundle? = {
-    let path = Bundle.main.path(forResource: "ZDPictureViewer", ofType: "bundle")
-    let bundle = Bundle(path: path!)
+public let ZDPictureViewerBundle: Bundle? = {
+    let bundle = Bundle(path: Bundle(for: ZDPictureBrowseView.classForCoder()).resourcePath! + "/ZDPictureViewer.bundle")
     return bundle
 }()
