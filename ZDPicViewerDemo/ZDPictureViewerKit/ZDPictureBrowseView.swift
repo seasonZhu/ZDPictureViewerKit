@@ -72,12 +72,16 @@ public class ZDPictureBrowseView: UIView {
     //  大图
     private lazy var bigImageView: AnimatedImageView = {
         let imageView = AnimatedImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     //  小图
     private lazy var smallImageView: AnimatedImageView = {
         let imageView = AnimatedImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -98,8 +102,9 @@ public class ZDPictureBrowseView: UIView {
     
     private var selectCallback: ((IndexPath) -> (AnimatedImageView))!
     
-    private var runable: ((UIImage?) -> ())?
+    private var rightButtonAction: ((UIImage?) -> ())?
     
+    private var longPressAction: ((UIImage?, UILongPressGestureRecognizer) -> ())?
     
     //  初始化
     @discardableResult
@@ -108,7 +113,8 @@ public class ZDPictureBrowseView: UIView {
                            currentIndexPath: IndexPath,
                            parentVC: UIViewController,
                            placeholder: UIImage?,
-                           runable: ((UIImage?) -> ())? = nil,
+                           rightButtonAction: ((UIImage?) -> ())? = nil,
+                           longPressAction: ((UIImage?, UILongPressGestureRecognizer) -> ())? = nil,
                            selectCallback: @escaping ((IndexPath) -> (AnimatedImageView))) -> ZDPictureBrowseView {
         
         let pictureBrowseView = ZDPictureBrowseView(frame: parentVC.view.bounds)
@@ -117,7 +123,8 @@ public class ZDPictureBrowseView: UIView {
         pictureBrowseView.currentIndexPath = currentIndexPath
         pictureBrowseView.parentVC = parentVC
         pictureBrowseView.placeholder = placeholder
-        pictureBrowseView.runable = runable
+        pictureBrowseView.rightButtonAction = rightButtonAction
+        pictureBrowseView.longPressAction = longPressAction
         pictureBrowseView.selectCallback = selectCallback
         pictureBrowseView.show()
         return pictureBrowseView
@@ -160,9 +167,9 @@ extension ZDPictureBrowseView {
         let vcFrame = smallImageView.convert(smallImageView.bounds, to: self)
         bigImageView.frame = vcFrame
         bigImageView.image = image
+        
         backgroundView.addSubview(bigImageView)
         backgroundView.alpha = 0
-        
         backgroundView.frame = bounds
         addSubview(backgroundView)
     }
@@ -214,8 +221,8 @@ extension ZDPictureBrowseView {
         
         smallImageView = selectCallback(currentIndexPath)
         
-        if smallImageView.image != nil {
-            bigImageView.image = smallImageView.image
+        if let image = smallImageView.image {
+            bigImageView.image = image
         }
         
         backgroundView.alpha = 1
@@ -233,7 +240,13 @@ extension ZDPictureBrowseView {
     @objc
     private func rightButtonAction(_ button: UIButton) {
         let image = (collectionView.cellForItem(at: currentIndexPath) as? ZDPictureBrowseCell)?.imageView.image
-        runable?(image)
+        rightButtonAction?(image)
+    }
+    
+    //MARK:- 长按的手势事件
+    private func longPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        let image = (collectionView.cellForItem(at: currentIndexPath) as? ZDPictureBrowseCell)?.imageView.image
+        longPressAction?(image, gestureRecognizer)
     }
 }
 
@@ -251,6 +264,7 @@ extension ZDPictureBrowseView: UICollectionViewDataSource {
     //  collectionView单元格创建
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! ZDPictureBrowseCell
+        //  这里一定要先写isUrl赋值,再写imageInfo的赋值 其实应该创建一个模型
         cell.isUrl = isUrl
         cell.imageInfo = imageInfos[indexPath.item]
         cell.tag = kCommonTag + indexPath.item
@@ -270,6 +284,10 @@ extension ZDPictureBrowseView: UICollectionViewDataSource {
             self?.collectionView.backgroundColor = UIColor.black.withAlphaComponent(progress)
             self?.bigImageView.frame = panFrame
             self?.collectionView.isScrollEnabled = progress == 1.0
+        }
+        
+        cell.longPressCallback = { [weak self] gestureRecognizer in
+            self?.longPress(gestureRecognizer)
         }
         
         return cell

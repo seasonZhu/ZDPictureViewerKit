@@ -25,10 +25,10 @@ class ZDPictureBrowseCell: UICollectionViewCell {
         let twoFingerTap = UITapGestureRecognizer(target: self, action: #selector(twoFingerTapAction(_:)))
         let longPressTap = UILongPressGestureRecognizer(target: self, action: #selector(longPressTapAction(_:)))
         
-        singleTap.numberOfTapsRequired = 1;
-        singleTap.numberOfTouchesRequired = 1;
-        doubleTap.numberOfTapsRequired = 2;
-        twoFingerTap.numberOfTouchesRequired = 2;
+        singleTap.numberOfTapsRequired = 1
+        singleTap.numberOfTouchesRequired = 1
+        doubleTap.numberOfTapsRequired = 2
+        twoFingerTap.numberOfTouchesRequired = 2
         singleTap.require(toFail: doubleTap)
         
         imageView.addGestureRecognizer(singleTap)
@@ -54,7 +54,7 @@ class ZDPictureBrowseCell: UICollectionViewCell {
                     //  菊花转
                 }
                 
-                guard let url = URL.init(string: newValue) else {
+                guard let url = URL(string: newValue) else {
                     return
                 }
                 
@@ -91,6 +91,10 @@ class ZDPictureBrowseCell: UICollectionViewCell {
     
     //  滑动回调
     var panCallback: ((_ progress: CGFloat, _ imageViewFrame: CGRect) -> ())?
+    
+    
+    //  长按的回调
+    var longPressCallback: ((_ gestureRecognizer: UILongPressGestureRecognizer) -> ())?
     
     //  移动的图片
     private var moveImageView: AnimatedImageView?
@@ -210,6 +214,7 @@ class ZDPictureBrowseCell: UICollectionViewCell {
     @objc
     private func longPressTapAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
         print("longPressTapAction")
+        longPressCallback?(gestureRecognizer)
     }
     
     //  滑动事件
@@ -225,8 +230,8 @@ class ZDPictureBrowseCell: UICollectionViewCell {
         //  两指
         if gestureRecognizer.numberOfTouches != 1 || isZooming {
             moveImageView = nil
-            isPanning = false
             panBeginPoint = CGPoint.zero
+            isPanning = false
             return
         }
         
@@ -315,10 +320,10 @@ extension ZDPictureBrowseCell {
         let size = image.size
         
         if (size.width) / self.frame.width > (size.height) / self.frame.height {
-            imageView.frame.size.width = self.frame.width
+            imageView.frame.size.width = frame.width
             imageView.frame.size.height = (imageView.frame.width) * (size.height) / (size.width)
         }else{
-            imageView.frame.size.height = self.frame.height
+            imageView.frame.size.height = frame.height
             imageView.frame.size.width = (imageView.frame.height) * (size.width) / (size.height)
         }
         

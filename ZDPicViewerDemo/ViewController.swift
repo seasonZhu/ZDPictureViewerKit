@@ -134,10 +134,20 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        ZDPictureBrowseView.show(isUrl: changeButton.isSelected, imageInfos: dataSource, currentIndexPath: indexPath, parentVC: self, placeholder: nil, runable: { image in
-            //  这个runable是用于执行右侧上方的按钮点击事件
-            print("点击了右侧按钮")
-            print(image)
+        ZDPictureBrowseView.show(isUrl: changeButton.isSelected,
+                                 imageInfos: dataSource,
+                                 currentIndexPath: indexPath,
+                                 parentVC: self,
+                                 placeholder: nil,
+                                 rightButtonAction: { image in
+                                    //  这个runable是用于执行右侧上方的按钮点击事件
+                                    print("点击了右侧按钮")
+                                    print(image)
+        },
+                                 longPressAction: { image, gestureRecognizer in
+                                    print("长按手势")
+                                    print(image)
+            
         }) { callbackIndexPaht in
             guard let cell = collectionView.cellForItem(at: callbackIndexPaht) as? ZDPictureViewCell else {
                 return AnimatedImageView()
