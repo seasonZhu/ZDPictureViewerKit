@@ -12,7 +12,7 @@ import Kingfisher
 class ViewController: UIViewController {
     
     //MARK:- 属性设置
-    private let cellIdentifier = "cellIdentifier"
+    private let cellIdentifier = String(describing: type(of: ZDPictureViewCell.self))
     
     private var dataSource = [String]()
     
@@ -40,12 +40,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadLocalData()
-        initCollectionView()
-        initChangeImageTypeButton()
+        setUpUI()
     }
     
-    // MARK:
-    func loadLocalData() {
+    // MARK: - 加载图片的事件
+    private func loadLocalData() {
         dataSource.removeAll()
         
         for _ in 1...7 {
@@ -54,12 +53,12 @@ class ViewController: UIViewController {
             }
         }
         
-        resultCallback = { (name) -> (UIImage?) in
+        resultCallback = { name in
             return UIImage(named: name)
         }
     }
     
-    func loadUrlData() {
+    private func loadUrlData() {
         dataSource.removeAll()
         
         for _ in 1...7 {
@@ -71,14 +70,13 @@ class ViewController: UIViewController {
         resultCallback = nil
     }
     
-    // MARK:UI
-    func initCollectionView() {
-        
+    // MARK: -搭建界面
+    private func setUpUI() {
         collectionView?.removeFromSuperview()
         collectionView = nil
         let defaultLayout = UICollectionViewFlowLayout()
         defaultLayout.scrollDirection = UICollectionViewScrollDirection.vertical
-        collectionView = UICollectionView(frame: CGRect(x:45.0/4.0, y:UIApplication.shared.statusBarFrame.height + 44, width:kScreenWidth - 45.0/2.0, height:kScreenHeight - (UIApplication.shared.statusBarFrame.height + 44)), collectionViewLayout: defaultLayout)
+        collectionView = UICollectionView(frame: CGRect(x:45.0 / 4.0, y:UIApplication.shared.statusBarFrame.height + 44, width:UIScreen.main.bounds.width - 45.0 / 2.0, height:UIScreen.main.bounds.height - (UIApplication.shared.statusBarFrame.height + 44)), collectionViewLayout: defaultLayout)
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ZDPictureViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView?.dataSource = self
@@ -87,25 +85,22 @@ class ViewController: UIViewController {
         collectionView?.showsHorizontalScrollIndicator = false
         view.addSubview(collectionView!)
         
-    }
-    
-    func initChangeImageTypeButton() {
-        let button = UIButton(frame: CGRect(x: 50, y: kScreenHeight - 100, width: kScreenWidth - 100, height: 40))
+        let button = UIButton(frame: CGRect(x: 50, y: UIScreen.main.bounds.height - 100, width: UIScreen.main.bounds.width - 100, height: 40))
         button.addTarget(self, action: #selector(changeImageTypeButtonAction(_ :)), for: UIControlEvents.touchUpInside)
         button.backgroundColor = UIColor.lightGray
-        button.setTitle("change to web pictures", for: .normal)
+        button.setTitle("切换到网络图片", for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         button.layer.cornerRadius = button.frame.height/2.0
         view.addSubview(button)
         self.changeButton = button
     }
-
+    
     
     //MARK:- 按钮的点击事件
     @objc
-    func changeImageTypeButtonAction(_ button :UIButton) {
+    private func changeImageTypeButtonAction(_ button :UIButton) {
         button.isSelected = !button.isSelected
-        button.setTitle(button.isSelected ? "change to lcoal pictures" : "change to web pictures", for: .normal)
+        button.setTitle(button.isSelected ? "切换到本地图片" : "切换到网络图片", for: .normal)
         button.isSelected == true ? loadUrlData() : loadLocalData()
         collectionView?.reloadData()
     }
@@ -129,9 +124,7 @@ extension ViewController: UICollectionViewDataSource {
         if isUrl {
             cell.imageView.kf.setImage(with:URL.init(string: dataSource[indexPath.row] ),
                                        placeholder: UIImage(named: "placeholder", in: ZDPictureViewerBundle, compatibleWith: nil),
-                                       options: [.backgroundDecode],
-                                       progressBlock: nil,
-                                       completionHandler: nil)
+                                       options: [.backgroundDecode])
         }else {
             cell.imageView.image = resultCallback?(dataSource[indexPath.row])
         }
@@ -141,9 +134,11 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        ZDPictureBrowseView.show(isUrl: changeButton.isSelected, imageInfos: dataSource, currentIndexPath: indexPath, parentVC: self, placeholder: nil, runable: {
+        ZDPictureBrowseView.show(isUrl: changeButton.isSelected, imageInfos: dataSource, currentIndexPath: indexPath, parentVC: self, placeholder: nil, runable: { image in
+            //  这个runable是用于执行右侧上方的按钮点击事件
             print("点击了右侧按钮")
-        }) { (callbackIndexPaht) -> (AnimatedImageView) in
+            print(image)
+        }) { callbackIndexPaht in
             guard let cell = collectionView.cellForItem(at: callbackIndexPaht) as? ZDPictureViewCell else {
                 return AnimatedImageView()
             }
@@ -154,10 +149,10 @@ extension ViewController: UICollectionViewDelegate {
     
 }
 
-
+// MARK: - 使用代理进行layout设置
 extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: kScreenWidth/3.0 - 15.0, height: kScreenWidth/3.0 - 15.0)
+        return CGSize(width: UIScreen.main.bounds.width / 3.0 - 15.0, height: UIScreen.main.bounds.width / 3.0 - 15.0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {

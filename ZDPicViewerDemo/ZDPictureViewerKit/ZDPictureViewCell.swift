@@ -9,7 +9,8 @@
 import UIKit
 import Kingfisher
 
-class ZDPictureViewCell: UICollectionViewCell {
+/// 这个类可用可不用,因为实际开发中你的cell的结构往往比这个更为复杂
+public class ZDPictureViewCell: UICollectionViewCell {
     //MARK:- 属性设置
     
     //  图片
@@ -26,7 +27,7 @@ class ZDPictureViewCell: UICollectionViewCell {
         setUpUI()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     

@@ -18,7 +18,3 @@ let ZDPictureViewerBundle: Bundle? = {
     let bundle = Bundle(path: path!)
     return bundle
 }()
-
-//  宽高
-let kScreenWidth = UIScreen.main.bounds.width
-let kScreenHeight = UIScreen.main.bounds.height

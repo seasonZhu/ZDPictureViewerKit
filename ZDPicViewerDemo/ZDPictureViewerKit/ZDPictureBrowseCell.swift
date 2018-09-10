@@ -12,6 +12,33 @@ import Kingfisher
 class ZDPictureBrowseCell: UICollectionViewCell {
     //MARK:- 属性设置
     
+    //  图片view
+    lazy var imageView: AnimatedImageView = {
+        let imageView = AnimatedImageView()
+        imageView.frame = bounds
+        imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
+        
+        //  手势
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(_:)))
+        let twoFingerTap = UITapGestureRecognizer(target: self, action: #selector(twoFingerTapAction(_:)))
+        let longPressTap = UILongPressGestureRecognizer(target: self, action: #selector(longPressTapAction(_:)))
+        
+        singleTap.numberOfTapsRequired = 1;
+        singleTap.numberOfTouchesRequired = 1;
+        doubleTap.numberOfTapsRequired = 2;
+        twoFingerTap.numberOfTouchesRequired = 2;
+        singleTap.require(toFail: doubleTap)
+        
+        imageView.addGestureRecognizer(singleTap)
+        imageView.addGestureRecognizer(doubleTap)
+        imageView.addGestureRecognizer(twoFingerTap)
+        imageView.addGestureRecognizer(longPressTap)
+        
+        return imageView
+    }()
+    
     //  是否是Url
     var isUrl = false
     
@@ -31,7 +58,9 @@ class ZDPictureBrowseCell: UICollectionViewCell {
                     return
                 }
                 
-                imageView.kf.setImage(with: url, placeholder: nil, options: [.backgroundDecode], progressBlock: { (receivedSize, totalSize) in
+                imageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder", in: ZDPictureViewerBundle, compatibleWith: nil),
+                                      options: [.backgroundDecode],
+                                      progressBlock: { (receivedSize, totalSize) in
                     
                 }) { [weak self] (image, error, type, url) in
                     
@@ -46,8 +75,9 @@ class ZDPictureBrowseCell: UICollectionViewCell {
                     self?.loadImageViewSize(image: unwrappedImage)
                 }
             }else {
-                imageView.image = UIImage(named: newValue)!
-                loadImageViewSize(image: imageView.image!)
+                guard let image = UIImage(named: newValue) else { return }
+                imageView.image = image
+                loadImageViewSize(image: image)
             }
         }get {
             return newImageInfo
@@ -94,37 +124,10 @@ class ZDPictureBrowseCell: UICollectionViewCell {
     private var imageBeginFrame = CGRect.zero
     
     //  min scaling ratio
-    let imageMinZoom: CGFloat = 0.3
+    private let imageMinZoom: CGFloat = 0.3
     
     //  0.0-1.0
-    let imagePanningSpeed: CGFloat = 1.0
-    
-    //  图片view
-    lazy var imageView: AnimatedImageView = {
-        let imageView = AnimatedImageView()
-        imageView.frame = bounds
-        imageView.contentMode = .scaleAspectFill
-        imageView.isUserInteractionEnabled = true
-        
-        //  手势
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
-        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(_:)))
-        let twoFingerTap = UITapGestureRecognizer(target: self, action: #selector(twoFingerTapAction(_:)))
-        let longPressTap = UILongPressGestureRecognizer(target: self, action: #selector(longPressTapAction(_:)))
-        
-        singleTap.numberOfTapsRequired = 1;
-        singleTap.numberOfTouchesRequired = 1;
-        doubleTap.numberOfTapsRequired = 2;
-        twoFingerTap.numberOfTouchesRequired = 2;
-        singleTap.require(toFail: doubleTap)
-        
-        imageView.addGestureRecognizer(singleTap)
-        imageView.addGestureRecognizer(doubleTap)
-        imageView.addGestureRecognizer(twoFingerTap)
-        imageView.addGestureRecognizer(longPressTap)
-        
-        return imageView
-    }()
+    private let imagePanningSpeed: CGFloat = 1.0
     
     //  scrollView
     private lazy var scrollView: UIScrollView = {
