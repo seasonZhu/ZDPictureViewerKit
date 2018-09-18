@@ -28,6 +28,8 @@ class ViewController: UIViewController {
     
     private var changeButton: UIButton!
     
+    private var isBeginMove = false
+    
     private let imageUrlArray = ["http://pic.qiantucdn.com/58pic/18/85/34/56561c9192d9f_1024.jpg",
                                  "http://wx2.sinaimg.cn/mw690/a1eface5ly1frjxl0pja4j21kw11xb29.jpg",
                                  "http://pic.qqtn.com/up/2017-2/201702131606225644712.png",
@@ -37,6 +39,7 @@ class ViewController: UIViewController {
                                  "http://wx2.sinaimg.cn/mw690/a1eface5ly1frjxl5otbsj21kw11xe81.jpg",
                                  "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536310847436&di=bf33c2b4618e53755b39283c750a9f66&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01e8fa5965991ba8012193a3195e5a.gif",]
     
+    //MARK:- viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         loadLocalData()
@@ -104,6 +107,26 @@ class ViewController: UIViewController {
         button.isSelected == true ? loadUrlData() : loadLocalData()
         collectionView?.reloadData()
     }
+    
+    //MARK:- 长按手势
+    @objc
+    private func moveCell(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        switch gestureRecognizer.state {
+        case .began:
+            if !isBeginMove {
+                isBeginMove = true
+                guard let selectedIndexPath = collectionView?.indexPathForItem(at: gestureRecognizer.location(in: collectionView)) else { return }
+                collectionView?.beginInteractiveMovementForItem(at: selectedIndexPath)
+            }
+        case .changed:
+            collectionView?.updateInteractiveMovementTargetPosition(gestureRecognizer.location(in: collectionView))
+        case .ended:
+            isBeginMove = false
+            collectionView?.endInteractiveMovement()
+        default:
+            collectionView?.cancelInteractiveMovement()
+        }
+    }
 }
 
 extension ViewController: UICollectionViewDataSource {
@@ -128,7 +151,17 @@ extension ViewController: UICollectionViewDataSource {
         }else {
             cell.imageView.image = resultCallback?(dataSource[indexPath.row])
         }
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(moveCell(_:)))
+        cell.addGestureRecognizer(longPress)
+        
         return cell;
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let data = dataSource[sourceIndexPath.item]
+        dataSource.remove(at: sourceIndexPath.item)
+        dataSource.insert(data, at: destinationIndexPath.item)
     }
 }
 
