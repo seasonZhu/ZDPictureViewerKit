@@ -30,6 +30,8 @@ class ViewController: UIViewController {
     
     private var isBeginMove = false
     
+    private var isShake = false
+    
     private let imageUrlArray = ["http://pic.qiantucdn.com/58pic/18/85/34/56561c9192d9f_1024.jpg",
                                  "http://wx2.sinaimg.cn/mw690/a1eface5ly1frjxl0pja4j21kw11xb29.jpg",
                                  "http://pic.qqtn.com/up/2017-2/201702131606225644712.png",
@@ -96,6 +98,9 @@ class ViewController: UIViewController {
         button.layer.cornerRadius = button.frame.height/2.0
         view.addSubview(button)
         self.changeButton = button
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
+        view.addGestureRecognizer(tap)
     }
     
     
@@ -108,6 +113,15 @@ class ViewController: UIViewController {
         collectionView?.reloadData()
     }
     
+    //MARK:- 点击手势
+    @objc
+    private func tapAction(_ tap: UITapGestureRecognizer) {
+        isShake = false
+        for cell in collectionView!.visibleCells {
+            stopShake(cell: cell)
+        }
+    }
+    
     //MARK:- 长按手势
     @objc
     private func moveCell(_ gestureRecognizer: UILongPressGestureRecognizer) {
@@ -117,6 +131,12 @@ class ViewController: UIViewController {
                 isBeginMove = true
                 guard let selectedIndexPath = collectionView?.indexPathForItem(at: gestureRecognizer.location(in: collectionView)) else { return }
                 collectionView?.beginInteractiveMovementForItem(at: selectedIndexPath)
+                
+                
+                isShake = true
+                for cell in collectionView!.visibleCells {
+                    startShake(cell: cell)
+                }
             }
         case .changed:
             collectionView?.updateInteractiveMovementTargetPosition(gestureRecognizer.location(in: collectionView))
@@ -126,6 +146,52 @@ class ViewController: UIViewController {
         default:
             collectionView?.cancelInteractiveMovement()
         }
+    }
+}
+
+extension ViewController {
+    //MARK:- 动画效果
+    private func startShake(cell: UICollectionViewCell) {
+        let keyAnimation = CAKeyframeAnimation()
+        keyAnimation.keyPath = "transform.rotation"
+        keyAnimation.values = [-3 / 180.0 * Double.pi, 3 / 180.0 * Double.pi, -3 / 180.0 * Double.pi]
+        keyAnimation.isRemovedOnCompletion = false
+        keyAnimation.fillMode = kCAFillModeForwards
+        keyAnimation.duration = 0.3
+        keyAnimation.repeatCount = Float(Int.max)
+        keyAnimation.autoreverses = true
+        
+        cell.layer.add(keyAnimation, forKey: "cellShake")
+    }
+    
+    private func stopShake(cell: UICollectionViewCell) {
+        cell.layer.removeAnimation(forKey: "cellShake")
+    }
+    
+    //MARK:- 获取collectionView所有的cell,这个貌似只有在scrollViewDidScroll代理中使用
+    private func getAllCell() -> [ZDPictureViewCell] {
+        
+        var cells = [ZDPictureViewCell]()
+        
+        let x = collectionView!.contentOffset.x
+        let y = collectionView!.contentOffset.y
+        let width = collectionView!.frame.width
+        let height = collectionView!.frame.height
+        let rect = CGRect(x: x, y: y, width: width, height: height)
+        
+        guard let views = collectionView!.subviews as? [UIView] else {
+            return cells
+        }
+        
+        for view in views {
+            if rect.intersects(collectionView!.frame) {
+                if let cell = view as? ZDPictureViewCell {
+                    cells.append(cell)
+                }
+            }
+        }
+        
+        return cells
     }
 }
 
@@ -219,3 +285,20 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+extension ViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !isShake {
+            return
+        }
+        
+        for cell in getAllCell() {
+            startShake(cell: cell)
+        }
+    }
+    
+    @objc func injected() {
+        print("I've been injected: (self)")
+        //调试的代码
+        
+    }
+}
