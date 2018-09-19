@@ -295,10 +295,4 @@ extension ViewController: UIScrollViewDelegate {
             startShake(cell: cell)
         }
     }
-    
-    @objc func injected() {
-        print("I've been injected: (self)")
-        //调试的代码
-        
-    }
 }
