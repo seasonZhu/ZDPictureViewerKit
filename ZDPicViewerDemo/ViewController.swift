@@ -136,9 +136,10 @@ class ViewController: UIViewController {
                 
                 
                 isShake = true
-                for cell in collectionView!.visibleCells {
-                    startShake(cell: cell)
-                }
+                collectionView?.reloadData()
+//                for cell in collectionView!.visibleCells {
+//                    startShake(cell: cell)
+//                }
             }
         case .changed:
             collectionView?.updateInteractiveMovementTargetPosition(gestureRecognizer.location(in: collectionView))
@@ -230,6 +231,12 @@ extension ViewController: UICollectionViewDataSource {
         let data = dataSource[sourceIndexPath.item]
         dataSource.remove(at: sourceIndexPath.item)
         dataSource.insert(data, at: destinationIndexPath.item)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if isShake {
+            startShake(cell: cell)
+        }
     }
 }
 
