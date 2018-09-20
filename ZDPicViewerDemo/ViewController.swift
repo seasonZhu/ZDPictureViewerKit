@@ -100,6 +100,7 @@ class ViewController: UIViewController {
         self.changeButton = button
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
+        tap.numberOfTapsRequired = 2
         view.addGestureRecognizer(tap)
     }
     
@@ -117,6 +118,7 @@ class ViewController: UIViewController {
     @objc
     private func tapAction(_ tap: UITapGestureRecognizer) {
         isShake = false
+        
         for cell in collectionView!.visibleCells {
             stopShake(cell: cell)
         }
