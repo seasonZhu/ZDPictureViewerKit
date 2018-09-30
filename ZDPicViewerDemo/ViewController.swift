@@ -118,7 +118,7 @@ class ViewController: UIViewController {
     @objc
     private func tapAction(_ tap: UITapGestureRecognizer) {
         isShake = false
-        
+
         for cell in collectionView!.visibleCells {
             stopShake(cell: cell)
         }
@@ -136,10 +136,10 @@ class ViewController: UIViewController {
                 
                 
                 isShake = true
-                collectionView?.reloadData()
-//                for cell in collectionView!.visibleCells {
-//                    startShake(cell: cell)
-//                }
+//                collectionView?.reloadData()
+                for cell in collectionView!.visibleCells {
+                    startShake(cell: cell)
+                }
             }
         case .changed:
             collectionView?.updateInteractiveMovementTargetPosition(gestureRecognizer.location(in: collectionView))
@@ -291,17 +291,5 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets{
         return UIEdgeInsetsMake(0, 0, 0, 0);
-    }
-}
-
-extension ViewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !isShake {
-            return
-        }
-        
-        for cell in getAllCell() {
-            startShake(cell: cell)
-        }
     }
 }
