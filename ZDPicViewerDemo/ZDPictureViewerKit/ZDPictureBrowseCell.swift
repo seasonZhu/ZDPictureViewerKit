@@ -92,7 +92,6 @@ class ZDPictureBrowseCell: UICollectionViewCell {
     //  滑动回调
     var panCallback: ((_ progress: CGFloat, _ imageViewFrame: CGRect) -> ())?
     
-    
     //  长按的回调
     var longPressCallback: ((_ gestureRecognizer: UILongPressGestureRecognizer) -> ())?
     
@@ -189,7 +188,7 @@ class ZDPictureBrowseCell: UICollectionViewCell {
         
         if gestureRecognizer.numberOfTapsRequired == 2 {
             
-            if scrollView.zoomScale == 1{
+            if scrollView.zoomScale == 1 {
                 let newScale = scrollView.zoomScale * 3.0
                 let zoomRect = zoomRectForScale(newScale, gestureRecognizer.location(in: gestureRecognizer.view))
                 scrollView.zoom(to: zoomRect, animated: true)

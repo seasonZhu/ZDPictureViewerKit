@@ -55,7 +55,7 @@ public class ZDPictureBrowseView: UIView {
     //  rightButton
     private lazy var rightButton: UIButton = {
         let button = UIButton()
-        button.frame = CGRect(x:self.frame.width - 40, y: UIApplication.shared.statusBarFrame.height, width: 20, height: 30)
+        button.frame = CGRect(x: self.frame.width - 40, y: UIApplication.shared.statusBarFrame.height, width: 20, height: 30)
         button.setImage(UIImage(named: "menu", in: ZDPictureViewerBundle, compatibleWith: nil), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(rightButtonAction(_:)), for: .touchUpInside)

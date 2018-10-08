@@ -80,8 +80,8 @@ class ViewController: UIViewController {
         collectionView?.removeFromSuperview()
         collectionView = nil
         let defaultLayout = UICollectionViewFlowLayout()
-        defaultLayout.scrollDirection = UICollectionViewScrollDirection.vertical
-        collectionView = UICollectionView(frame: CGRect(x:45.0 / 4.0, y:UIApplication.shared.statusBarFrame.height + 44, width:UIScreen.main.bounds.width - 45.0 / 2.0, height:UIScreen.main.bounds.height - (UIApplication.shared.statusBarFrame.height + 44)), collectionViewLayout: defaultLayout)
+        defaultLayout.scrollDirection = .vertical
+        collectionView = UICollectionView(frame: CGRect(x: 45.0 / 4.0, y: UIApplication.shared.statusBarFrame.height + 44, width: UIScreen.main.bounds.width - 45.0 / 2.0, height: UIScreen.main.bounds.height - (UIApplication.shared.statusBarFrame.height + 44)), collectionViewLayout: defaultLayout)
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ZDPictureViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView?.dataSource = self
@@ -91,11 +91,11 @@ class ViewController: UIViewController {
         view.addSubview(collectionView!)
         
         let button = UIButton(frame: CGRect(x: 50, y: UIScreen.main.bounds.height - 100, width: UIScreen.main.bounds.width - 100, height: 40))
-        button.addTarget(self, action: #selector(changeImageTypeButtonAction(_ :)), for: UIControlEvents.touchUpInside)
-        button.backgroundColor = UIColor.lightGray
+        button.addTarget(self, action: #selector(changeImageTypeButtonAction(_ :)), for: .touchUpInside)
+        button.backgroundColor = .lightGray
         button.setTitle("切换到网络图片", for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
-        button.layer.cornerRadius = button.frame.height/2.0
+        button.layer.cornerRadius = button.frame.height / 2.0
         view.addSubview(button)
         self.changeButton = button
         
@@ -110,7 +110,7 @@ class ViewController: UIViewController {
     private func changeImageTypeButtonAction(_ button :UIButton) {
         button.isSelected = !button.isSelected
         button.setTitle(button.isSelected ? "切换到本地图片" : "切换到网络图片", for: .normal)
-        button.isSelected == true ? loadUrlData() : loadLocalData()
+        button.isSelected ? loadUrlData() : loadLocalData()
         collectionView?.reloadData()
     }
     
