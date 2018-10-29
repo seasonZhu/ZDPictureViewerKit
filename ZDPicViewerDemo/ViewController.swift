@@ -214,8 +214,12 @@ extension ViewController: UICollectionViewDataSource {
         //cell.imageView.tag = kCommonTag + indexPath.item
         
         if isUrl {
+            let image = UIImage(named: "003.jpg")
+            let data = UIImageJPEGRepresentation(image!, 1)!
+            //cell.imageView.kf.indicatorType = .image(imageData: data)
+            cell.imageView.kf.indicatorType = .activity
             cell.imageView.kf.setImage(with:URL.init(string: dataSource[indexPath.row] ),
-                                       placeholder: UIImage(named: "placeholder", in: ZDPictureViewerBundle, compatibleWith: nil),
+                                       placeholder: nil,
                                        options: [.backgroundDecode])
         }else {
             cell.imageView.image = resultCallback?(dataSource[indexPath.row])
